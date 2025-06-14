@@ -1,3 +1,43 @@
 <resources>
+    <!-- 共通 -->
     <string name="app_name">PianoMemo</string>
+    <string name="confirm">記録確認</string>
+    <string name="record">記録する</string>
+    <string name="setting">設定</string>
+    <string name="description_of_the_image">Description of the image</string>
+
+    <!-- RecordScreen -->
+    <string name="music_name">曲名</string>
+    <string name="placeholder_music">ラ・カンパネラ</string>
+
+    <string name="artist_name">作曲者名</string>
+    <string name="placeholder_artist">リスト</string>
+
+    <string name="genre_name">ジャンル</string>
+    <string name="genre_user_input">クラシック</string>
+
+    <string name="style_name">演奏スタイル</string>
+    <string name="style_user_input">独奏</string>
+
+    <string name="memo_name">メモ</string>
+    <string name="placeholder_memo">アルペジオが上手く弾けない。</string>
+
+    <string name="right_hand">右手の習熟度</string>
+    <string name="left_hand">左手の習熟度</string>
+
+    <string name="record_button">記録する</string>
+
+    <!-- ConfirmScreen -->
+    <string name="no_record">記録無し</string>
+    <string name="no_record_description">まだ何も記録されていません。</string>
+    <string name="search_by_text">曲名・アーティスト名で検索</string>
+    <string name="content_description_search_icon">Search Icon</string>
+
+    <!-- SettingsScreen -->
+    <string name="setting_text_view">設定</string>
+    <string name="about_this_app">このアプリについて</string>
+    <string name="contact">お問い合わせ</string>
+    <string name="review">レビューする</string>
+    <string name="share_this_app">このアプリを共有する</string>
+    <string name="version">バージョン</string>
 </resources>
