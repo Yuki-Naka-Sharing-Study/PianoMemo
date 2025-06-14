@@ -3,6 +3,7 @@
     <dimen name="space_8_dp">8dp</dimen>
     <dimen name="space_16_dp">16dp</dimen>
     <dimen name="space_24_dp">24dp</dimen>
+    <dimen name="space_32_dp">32dp</dimen>
 
     <dimen name="text_size_normal">16sp</dimen>
     <dimen name="text_size_large">36sp</dimen>
