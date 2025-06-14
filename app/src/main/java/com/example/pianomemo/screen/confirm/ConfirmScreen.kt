@@ -69,13 +69,15 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("全て", "クラシック", "ジャズ", "ポップス", "ロック", "その他")
-
     val musicInfoList = viewModel.musicInfo.collectAsState().value
-    val playableMusicCount = remember { mutableIntStateOf(0) }
+    val totalCount = remember { mutableIntStateOf(0) }
+    val practicingCount = remember { mutableIntStateOf(0) }
+    val playableCount = remember { mutableIntStateOf(0) }
+    val genre = tabs[selectedTabIndex]
 
     val filteredByGenre = when (selectedTabIndex) {
         0 -> musicInfoList
-        else -> musicInfoList.filter { it.nameOfJenre == tabs[selectedTabIndex] }
+        else -> musicInfoList.filter { it.nameOfJenre == genre }
     }
 
     val filteredList = if (searchQuery.isEmpty()) {
@@ -91,8 +93,10 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
         }
     }
 
-    LaunchedEffect(Unit) {
-        playableMusicCount.intValue = viewModel.getPlayableMusicCount()
+    LaunchedEffect(genre) {
+        totalCount.intValue = viewModel.getMusicInfoCountByGenre(genre)
+        practicingCount.intValue = viewModel.getPracticingMusicCountByGenre(genre)
+        playableCount.intValue = viewModel.getPlayableMusicCountByGenre(genre)
     }
 
     if (musicInfoList.isEmpty()) {
@@ -131,7 +135,7 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
                 Spacer(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.space_16_dp)))
                 Text("合計曲数：")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_8_dp)))
-                Text("${musicInfoList.size}")
+                Text("${totalCount.intValue}")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_24_dp)))
             }
 
@@ -144,13 +148,12 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
                 Spacer(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.space_16_dp)))
                 Text("練習中の合計曲数：")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_8_dp)))
-                val practicingMusicList: Int = musicInfoList.size - playableMusicCount.value
-                Text(practicingMusicList.toString())
+                Text("${practicingCount.intValue}")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_32_dp)))
 
                 Text("完璧に弾ける合計曲数：")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_8_dp)))
-                Text("${playableMusicCount.value}")
+                Text("${playableCount.value}")
             }
 
             SearchScreen(searchQuery, { searchQuery = it })

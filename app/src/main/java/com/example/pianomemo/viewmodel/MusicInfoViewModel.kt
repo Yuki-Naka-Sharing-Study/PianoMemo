@@ -30,6 +30,12 @@ class MusicInfoViewModel(
         preferences[ONBOARDING_COMPLETED_KEY] ?: true
     }
 
+    init {
+        viewModelScope.launch {
+            _musicInfo.value = musicInfoDao.getAllMusicInfo()
+        }
+    }
+
     fun completeOnboarding() {
         viewModelScope.launch {
             dataStore.edit { preferences ->
@@ -38,16 +44,12 @@ class MusicInfoViewModel(
         }
     }
 
-    init {
-        viewModelScope.launch {
-            _musicInfo.value = musicInfoDao.getAllMusicInfo()
-        }
-    }
     fun loadAllMusicInfo() {
         viewModelScope.launch {
             _musicInfo.value = repository.getAllMusicInfo()
         }
     }
+
     fun saveValues(
         textOfMusic: String,
         textOfArtist: String,
@@ -56,8 +58,7 @@ class MusicInfoViewModel(
         textOfMemo: String,
         numOfRightHand: Float,
         numOfLeftHand: Float,
-    )
-    {
+    ) {
         viewModelScope.launch {
             repository.saveMusicInfo(
                 textOfMusic,
@@ -71,21 +72,35 @@ class MusicInfoViewModel(
             loadAllMusicInfo()
         }
     }
+
     fun deleteMusicValues(musicInfo: MusicInfo) {
         viewModelScope.launch {
             repository.deleteMusicInfo(musicInfo)
-            this@MusicInfoViewModel._musicInfo.value = musicInfoDao.getAllMusicInfo()
+            _musicInfo.value = musicInfoDao.getAllMusicInfo()
         }
     }
+
     fun updateMusicValues(musicInfo: MusicInfo) {
         viewModelScope.launch {
             repository.updateMusicInfo(musicInfo)
-            this@MusicInfoViewModel._musicInfo.value = musicInfoDao.getAllMusicInfo()
+            _musicInfo.value = musicInfoDao.getAllMusicInfo()
         }
     }
-    suspend fun getPlayableMusicCount(): Int {
-        // 右手と左手の習熟度が100の曲をフィルタリング
+
+    suspend fun getPlayableMusicCountByGenre(genre: String?): Int {
         return musicInfoDao.getAllMusicInfo()
+            .filter { genre == null || genre == "全て" || it.nameOfJenre == genre }
             .count { it.levelOfRightHand == 100 && it.levelOfLeftHand == 100 }
+    }
+
+    suspend fun getPracticingMusicCountByGenre(genre: String?): Int {
+        return musicInfoDao.getAllMusicInfo()
+            .filter { genre == null || genre == "全て" || it.nameOfJenre == genre }
+            .count { it.levelOfRightHand < 100 || it.levelOfLeftHand < 100 }
+    }
+
+    suspend fun getMusicInfoCountByGenre(genre: String?): Int {
+        return musicInfoDao.getAllMusicInfo()
+            .count { genre == null || genre == "全て" || it.nameOfJenre == genre }
     }
 }
