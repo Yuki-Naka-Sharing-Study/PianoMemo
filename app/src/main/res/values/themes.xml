@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.PianoMemo" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.PianoMemo" parent="Theme.SplashScreen" >
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="postSplashScreenTheme">@style/Theme.PianoMemo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+    </style>
+    <style name="CustomDatePickerTheme" parent="android:Theme.Material.Light.Dialog">
+        <item name="android:colorAccent">#4169e1</item>
+    </style>
 </resources>
