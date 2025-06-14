@@ -18,54 +18,60 @@ import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.pianomemo.ui.theme.PianoMemoTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen() {
     val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "設定",
-            fontSize = 24.sp,
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "設定",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            textAlign = TextAlign.Center
-        )
+                .padding(innerPadding)
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Spacer(modifier = Modifier.height(32.dp))
+            val items = listOf(
+                "このアプリについて" to {},
+                "お問い合わせ" to {
+                    val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                        data = Uri.parse("mailto:support@example.com")
+                        putExtra(Intent.EXTRA_SUBJECT, "お問い合わせ")
+                    }
+                    context.startActivity(emailIntent)
+                },
+                "レビューする" to {
+                    val reviewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.example.app"))
+                    context.startActivity(reviewIntent)
+                },
+                "このアプリを共有する" to {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, "このアプリをチェックしてみて！\nhttps://play.google.com/store/apps/details?id=com.example.app")
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, "アプリを共有"))
+                },
+                "バージョン 1.0.0" to {}
+            )
 
-        val items = listOf(
-            "このアプリについて" to {},
-            "お問い合わせ" to {
-                val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                    data = Uri.parse("mailto:support@example.com")
-                    putExtra(Intent.EXTRA_SUBJECT, "お問い合わせ")
-                }
-                context.startActivity(emailIntent)
-            },
-            "レビューする" to {
-                val reviewIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.example.app"))
-                context.startActivity(reviewIntent)
-            },
-            "このアプリを共有する" to {
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, "このアプリをチェックしてみて！\nhttps://play.google.com/store/apps/details?id=com.example.app")
-                }
-                context.startActivity(Intent.createChooser(shareIntent, "アプリを共有"))
-            },
-            "バージョン 1.0.0" to {}
-        )
-
-        items.forEach { (title, action) ->
-            SettingsItem(title, action)
+            items.forEach { (title, action) ->
+                SettingsItem(title, action)
+            }
         }
     }
 }
