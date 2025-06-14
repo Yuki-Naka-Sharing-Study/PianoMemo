@@ -3,6 +3,7 @@ package com.example.pianomemo.screen.record
 import com.example.pianomemo.R
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,6 +33,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -60,6 +63,7 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +75,7 @@ import com.example.pianomemo.data.remote.SpotifyApiService
 import com.example.pianomemo.data.remote.Track
 import com.example.pianomemo.viewmodel.MusicInfoViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,6 +257,7 @@ fun RecordScreen(
                         && textOfMemo.isNotBlank()
                         && numOfRightHand > 1
                         && numOfLeftHand > 1
+                var showToast by remember { mutableStateOf(false) }
 
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -274,9 +280,16 @@ fun RecordScreen(
                                     numOfLeftHand
                                 )
                             },
-                            enabled = isButtonEnabled
+                            enabled = isButtonEnabled,
+                            onShowToast = { showToast = true }
                         )
                     }
+                    PianoToast(
+                        message = "記録しました",
+                        imageResId = R.drawable.music_note,
+                        visible = showToast,
+                        onDismiss = { showToast = false }
+                    )
                 }
                 Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
             }
@@ -539,13 +552,13 @@ private fun CircularProgressWithSeekBar(
 @Composable
 private fun SaveButton(
     onClick: () -> Unit = {},
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onShowToast: () -> Unit = {}
 ) {
-    val context = LocalContext.current
     Button(
         onClick = {
             onClick()
-            showToast(context, "記録しました")
+            onShowToast()
         },
         colors = ButtonDefaults.buttonColors(Color.Blue),
         shape = RoundedCornerShape(8.dp),
@@ -560,4 +573,45 @@ private fun showToast(
     message: String
 ) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+@Composable
+fun PianoToast(
+    message: String,
+    imageResId: Int,
+    visible: Boolean,
+    onDismiss: () -> Unit
+) {
+    if (visible) {
+        LaunchedEffect(Unit) {
+            delay(2000)
+            onDismiss()
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.BottomCenter
+        ) {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.wrapContentSize(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = imageResId),
+                        contentDescription = "Piano",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = message)
+                }
+            }
+        }
+    }
 }
