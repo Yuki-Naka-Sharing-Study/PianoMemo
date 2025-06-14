@@ -32,8 +32,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
+import androidx.compose.material.Tab
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
@@ -65,12 +67,21 @@ import com.example.pianomemo.viewmodel.MusicInfoViewModel
 @Composable
 fun ConfirmScreen(viewModel: MusicInfoViewModel) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("全て", "クラシック", "ジャズ", "ポップス", "ロック", "その他")
+
     val musicInfoList = viewModel.musicInfo.collectAsState().value
     val playableMusicCount = remember { mutableIntStateOf(0) }
+
+    val filteredByGenre = when (selectedTabIndex) {
+        0 -> musicInfoList
+        else -> musicInfoList.filter { it.nameOfJenre == tabs[selectedTabIndex] }
+    }
+
     val filteredList = if (searchQuery.isEmpty()) {
-        musicInfoList
+        filteredByGenre
     } else {
-        musicInfoList.filter { musicInfo ->
+        filteredByGenre.filter { musicInfo ->
             listOf(
                 musicInfo.nameOfMusic,
                 musicInfo.nameOfArtist,
@@ -96,22 +107,36 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
             )
         }
     } else {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            ScrollableTabRow(
+                selectedTabIndex = selectedTabIndex,
+                backgroundColor = MaterialTheme.colors.surface,
+                contentColor = MaterialTheme.colors.primary
+            ) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = { selectedTabIndex = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.padding(top = dimensionResource(id = R.dimen.space_16_dp)))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
-            ){
+            ) {
                 Spacer(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.space_16_dp)))
                 Text("合計曲数：")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_8_dp)))
                 Text("${musicInfoList.size}")
                 Spacer(modifier = Modifier.padding(end = dimensionResource(id = R.dimen.space_24_dp)))
             }
+
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -128,9 +153,7 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
                 Text("${playableMusicCount.value}")
             }
 
-            SearchScreen(
-                searchQuery, { searchQuery = it }
-            )
+            SearchScreen(searchQuery, { searchQuery = it })
 
             if (filteredList.isEmpty()) {
                 Box(
@@ -144,20 +167,10 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
                     )
                 }
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(items = filteredList ) { musicInfo ->
-                        MusicItem(musicInfo = musicInfo, viewModel)
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(filteredList) { musicInfo ->
+                        MusicItem(musicInfo = musicInfo, viewModel = viewModel)
                     }
-                }
-            }
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(items = musicInfoList) { musicInfo ->
-                    MusicItem(musicInfo = musicInfo, viewModel)
                 }
             }
         }
