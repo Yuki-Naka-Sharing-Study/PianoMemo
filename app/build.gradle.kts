@@ -66,6 +66,9 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
 
+    // appcompat
+    implementation("androidx.appcompat:appcompat:1.7.1")
+
     // accompanist-pager
     implementation("com.google.accompanist:accompanist-pager-indicators:0.27.1")
     implementation("com.google.accompanist:accompanist-pager:0.27.1")
