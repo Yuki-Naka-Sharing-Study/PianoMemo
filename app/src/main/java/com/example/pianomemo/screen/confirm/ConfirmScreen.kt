@@ -115,7 +115,8 @@ fun ConfirmScreen(viewModel: MusicInfoViewModel) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 backgroundColor = MaterialTheme.colors.surface,
-                contentColor = MaterialTheme.colors.primary
+                contentColor = MaterialTheme.colors.primary,
+                edgePadding = 0.dp
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
