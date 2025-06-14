@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
@@ -30,6 +31,16 @@ fun MyApp(
 ) {
     val navController = rememberNavController()
     val isFirstLaunchState = viewModel.isFirstLaunch.collectAsState(initial = null)
+
+    if (isFirstLaunchState.value == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     Scaffold (
         modifier = Modifier.fillMaxSize(),
