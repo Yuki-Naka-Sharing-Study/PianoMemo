@@ -25,17 +25,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -70,6 +73,7 @@ import com.example.pianomemo.viewmodel.MusicInfoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordScreen(
     viewModel: MusicInfoViewModel,
@@ -136,184 +140,202 @@ fun RecordScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .clickable(interactionSource = interactionSource, indication = null) {
-                focusManager.clearFocus()
-            }
-            .padding(dimensionResource(id = R.dimen.space_16_dp))
-    ) {
-        Column {
-            MusicOutlinedTextField(
-                label = stringResource(id = R.string.music_name),
-                placeholder = stringResource(id = R.string.placeholder_music),
-                value = textOfMusic,
-                onValueChange = { textOfMusic = it },
-                modifier = musicFieldModifier
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "記録",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             )
+        }
+    ) { innerPadding ->
 
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                }
+                .padding(dimensionResource(id = R.dimen.space_16_dp))
+        ) {
+            Column {
+                MusicOutlinedTextField(
+                    label = stringResource(id = R.string.music_name),
+                    placeholder = stringResource(id = R.string.placeholder_music),
+                    value = textOfMusic,
+                    onValueChange = { textOfMusic = it },
+                    modifier = musicFieldModifier
+                )
 
-            MusicOutlinedTextField(
-                label = stringResource(id = R.string.artist_name),
-                placeholder = stringResource(id = R.string.placeholder_artist),
-                value = textOfArtist,
-                onValueChange = { textOfArtist = it },
-                modifier = artistFieldModifier
-            )
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
 
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
+                MusicOutlinedTextField(
+                    label = stringResource(id = R.string.artist_name),
+                    placeholder = stringResource(id = R.string.placeholder_artist),
+                    value = textOfArtist,
+                    onValueChange = { textOfArtist = it },
+                    modifier = artistFieldModifier
+                )
 
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
+
                 Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = dimensionResource(id = R.dimen.space_16_dp)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "ジャンル")
+                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.space_16_dp)))
+                        DropdownMenuWithIcon(
+                            modifier = Modifier.weight(1f),
+                            items = listOf("クラシック", "ジャズ", "ポップス", "ロック", "その他"),
+                            value = textOfGenre,
+                            onValueChange = { textOfGenre = it },
+                        )
+                    }
+                    Row (
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Text(text = "演奏スタイル")
+                        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.space_16_dp)))
+                        DropdownMenuWithIcon(
+                            modifier = Modifier.weight(1f),
+                            items = listOf("独奏", "連弾", "伴奏", "弾き語り"),
+                            value = textOfStyle,
+                            onValueChange = { textOfStyle = it }
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
+                MusicOutlinedTextField(
+                    label = stringResource(id = R.string.memo_name),
+                    placeholder = stringResource(id = R.string.placeholder_memo),
+                    value = textOfMemo,
+                    onValueChange = { textOfMemo = it },
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(end = dimensionResource(id = R.dimen.space_16_dp)),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "ジャンル")
-                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.space_16_dp)))
-                    DropdownMenuWithIcon(
-                        modifier = Modifier.weight(1f),
-                        items = listOf("クラシック", "ジャズ", "ポップス", "ロック", "その他"),
-                        value = textOfGenre,
-                        onValueChange = { textOfGenre = it },
-                    )
-                }
-                Row (
-                    modifier = Modifier.weight(1f),
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Text(text = "演奏スタイル")
-                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.space_16_dp)))
-                    DropdownMenuWithIcon(
-                        modifier = Modifier.weight(1f),
-                        items = listOf("独奏", "連弾", "伴奏", "弾き語り"),
-                        value = textOfStyle,
-                        onValueChange = { textOfStyle = it }
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_8_dp)))
-            MusicOutlinedTextField(
-                label = stringResource(id = R.string.memo_name),
-                placeholder = stringResource(id = R.string.placeholder_memo),
-                value = textOfMemo,
-                onValueChange = { textOfMemo = it },
-                modifier = Modifier
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
-            ProgressSection(stringResource(id = R.string.right_hand)) {
-                CircularProgressWithSeekBar(
-                    value = numOfRightHand,
-                    onValueChange = { numOfRightHand = it }
                 )
-            }
 
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
+                ProgressSection(stringResource(id = R.string.right_hand)) {
+                    CircularProgressWithSeekBar(
+                        value = numOfRightHand,
+                        onValueChange = { numOfRightHand = it }
+                    )
+                }
 
-            ProgressSection(stringResource(id = R.string.left_hand)) {
-                CircularProgressWithSeekBar(
-                    value = numOfLeftHand,
-                    onValueChange = { numOfLeftHand = it }
-                )
-            }
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
 
-            val isButtonEnabled = textOfMusic.isNotBlank()
-                    && textOfArtist.isNotBlank()
-                    && textOfGenre.isNotBlank()
-                    && textOfStyle.isNotBlank()
-                    && textOfMemo.isNotBlank()
-                    && numOfRightHand > 1
-                    && numOfLeftHand > 1
+                ProgressSection(stringResource(id = R.string.left_hand)) {
+                    CircularProgressWithSeekBar(
+                        value = numOfLeftHand,
+                        onValueChange = { numOfLeftHand = it }
+                    )
+                }
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                val isButtonEnabled = textOfMusic.isNotBlank()
+                        && textOfArtist.isNotBlank()
+                        && textOfGenre.isNotBlank()
+                        && textOfStyle.isNotBlank()
+                        && textOfMemo.isNotBlank()
+                        && numOfRightHand > 1
+                        && numOfLeftHand > 1
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    SaveButton(
-                        onClick = {
-                            viewModel.saveValues(
-                                textOfMusic,
-                                textOfArtist,
-                                textOfGenre,
-                                textOfStyle,
-                                textOfMemo,
-                                numOfRightHand,
-                                numOfLeftHand
-                            )
-                        },
-                        enabled = isButtonEnabled
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SaveButton(
+                            onClick = {
+                                viewModel.saveValues(
+                                    textOfMusic,
+                                    textOfArtist,
+                                    textOfGenre,
+                                    textOfStyle,
+                                    textOfMemo,
+                                    numOfRightHand,
+                                    numOfLeftHand
+                                )
+                            },
+                            enabled = isButtonEnabled
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
+            }
+
+            if (isMusicSuggestionVisible && suggestedMusic.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(164.dp)
+                        .align(Alignment.TopStart)
+                        .offset(
+                            x = musicFieldOffset.value.x.dp,
+                            y = (musicFieldOffset.value.y + musicFieldHeight).dp
+                        )
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.9f))
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                ) {
+                    items(suggestedMusic) { music ->
+                        Text(
+                            text = music.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    textOfMusic = music.name
+                                    isMusicSuggestionVisible = false
+                                }
+                                .padding(8.dp)
+                        )
+                    }
                 }
             }
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.space_16_dp)))
-        }
 
-        if (isMusicSuggestionVisible && suggestedMusic.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(164.dp)
-                    .align(Alignment.TopStart)
-                    .offset(
-                        x = musicFieldOffset.value.x.dp,
-                        y = (musicFieldOffset.value.y + musicFieldHeight).dp
-                    )
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            ) {
-                items(suggestedMusic) { music ->
-                    Text(
-                        text = music.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                textOfMusic = music.name
-                                isMusicSuggestionVisible = false
-                            }
-                            .padding(8.dp)
-                    )
-                }
-            }
-        }
-
-        if (isArtistsSuggestionVisible && suggestedArtists.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(164.dp)
-                    .align(Alignment.TopStart)
-                    .offset(
-                        x = artistFieldOffset.value.x.dp,
-                        y = (artistFieldOffset.value.y + artistFieldHeight).dp
-                    )
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
-            ) {
-                items(suggestedArtists) { artist ->
-                    Text(
-                        text = artist.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                textOfArtist = artist.name
-                                isArtistsSuggestionVisible = false
-                            }
-                            .padding(8.dp)
-                    )
+            if (isArtistsSuggestionVisible && suggestedArtists.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(164.dp)
+                        .align(Alignment.TopStart)
+                        .offset(
+                            x = artistFieldOffset.value.x.dp,
+                            y = (artistFieldOffset.value.y + artistFieldHeight).dp
+                        )
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White.copy(alpha = 0.9f))
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                ) {
+                    items(suggestedArtists) { artist ->
+                        Text(
+                            text = artist.name,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    textOfArtist = artist.name
+                                    isArtistsSuggestionVisible = false
+                                }
+                                .padding(8.dp)
+                        )
+                    }
                 }
             }
         }
@@ -356,7 +378,11 @@ private fun MusicOutlinedTextField(
     }
 }
 
-suspend fun fetchArtistSuggestions(query: String, authToken: String, retrofitService: SpotifyApiService): List<Artist> {
+suspend fun fetchArtistSuggestions(
+    query: String,
+    authToken: String,
+    retrofitService: SpotifyApiService
+): List<Artist> {
     return withContext(Dispatchers.IO) {
         try {
             val response = retrofitService.searchMusic(
@@ -460,7 +486,10 @@ private fun DropdownMenuWithIcon(
 }
 
 @Composable
-private fun ProgressSection(label: String, progressContent: @Composable () -> Unit) {
+private fun ProgressSection(
+    label: String,
+    progressContent: @Composable () -> Unit
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, fontSize = 20.sp)
         progressContent()
@@ -526,6 +555,9 @@ private fun SaveButton(
     }
 }
 
-private fun showToast(context: android.content.Context, message: String) {
+private fun showToast(
+    context: android.content.Context,
+    message: String
+) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }
