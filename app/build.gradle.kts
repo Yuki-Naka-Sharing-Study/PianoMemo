@@ -1,7 +1,8 @@
+import java.util.Properties
+
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.room)
     alias(libs.plugins.google.devtools.ksp)
 }
@@ -17,7 +18,26 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        // local.properties ファイルのパスを取得
+        val localPropertiesFile = rootProject.file("local.properties")
+        val localProperties = Properties()
+
+        // local.properties ファイルが存在する場合、プロパティを読み込む
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { stream ->
+                localProperties.load(stream)
+            }
+        }
+
+        // authToken プロパティを取得
+        val authToken: String = localProperties.getProperty("authToken") ?: ""
+        // BuildConfig に authToken を設定
+        buildConfigField("String", "AUTH_TOKEN", "\"$authToken\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -41,6 +61,15 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
