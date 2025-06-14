@@ -93,7 +93,7 @@ dependencies {
 
     // material
     implementation(libs.androidx.material)
-    implementation(libs.androidx.material3)
+    implementation("androidx.compose.material3:material3")
 
     // appcompat
     implementation("androidx.appcompat:appcompat:1.7.1")
