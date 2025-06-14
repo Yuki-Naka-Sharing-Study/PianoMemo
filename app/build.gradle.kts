@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.room)
+    alias(libs.plugins.google.devtools.ksp)
 }
 
 android {
@@ -34,12 +36,19 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    annotationProcessor(libs.androidx.room.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
