@@ -258,6 +258,8 @@ fun RecordScreen(
                         && numOfRightHand > 1
                         && numOfLeftHand > 1
                 var showToast by remember { mutableStateOf(false) }
+                var toastMessage by remember { mutableStateOf("") }
+                var toastIcon by remember { mutableIntStateOf(R.drawable.music_note) }
 
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -277,16 +279,25 @@ fun RecordScreen(
                                     textOfStyle,
                                     textOfMemo,
                                     numOfRightHand,
-                                    numOfLeftHand
+                                    numOfLeftHand,
+                                    onResult = { success ->
+                                        if (success) {
+                                            toastMessage = "記録しました"
+                                            toastIcon = R.drawable.music_note
+                                        } else {
+                                            toastMessage = "すでに同じ曲が登録されています"
+                                            toastIcon = R.drawable.warning
+                                        }
+                                        showToast = true
+                                    }
                                 )
                             },
-                            enabled = isButtonEnabled,
-                            onShowToast = { showToast = true }
+                            enabled = isButtonEnabled
                         )
                     }
                     PianoToast(
-                        message = "記録しました",
-                        imageResId = R.drawable.music_note,
+                        message = toastMessage,
+                        imageResId = toastIcon,
                         visible = showToast,
                         onDismiss = { showToast = false }
                     )

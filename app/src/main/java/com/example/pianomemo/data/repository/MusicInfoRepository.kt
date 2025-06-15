@@ -12,7 +12,15 @@ class MusicInfoRepository(private val musicInfoDao: MusicInfoDao) {
         textOfMemo: String,
         numOfRightHand: Float,
         numOfLeftHand: Float
-    ){
+    ): Boolean {
+        val exists = musicInfoDao.getMusicInfoByNameArtistAndStyle(
+            textOfMusic,
+            textOfArtist,
+            textOfStyle
+        ) != null
+
+        if (exists) return false
+
         val musicInfo = MusicInfo(
             nameOfMusic = textOfMusic,
             nameOfArtist = textOfArtist,
@@ -23,6 +31,7 @@ class MusicInfoRepository(private val musicInfoDao: MusicInfoDao) {
             levelOfLeftHand = numOfLeftHand.toInt()
         )
         musicInfoDao.insertMusicInfo(musicInfo)
+        return true
     }
     suspend fun getAllMusicInfo(): List<MusicInfo> {
         return musicInfoDao.getAllMusicInfo()

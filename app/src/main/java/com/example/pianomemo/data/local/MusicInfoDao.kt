@@ -13,9 +13,23 @@ interface MusicInfoDao {
 
     @Delete
     suspend fun deleteMusicInfo(item: MusicInfo)
+
     @Update
     suspend fun updateMusicInfo(item: MusicInfo)
 
     @Query("SELECT * FROM music_info")
     suspend fun getAllMusicInfo(): List<MusicInfo>
+
+    @Query("""
+    SELECT * FROM music_info 
+    WHERE nameOfMusic = :musicName 
+    AND nameOfArtist = :artistName 
+    AND nameOfStyle = :styleName 
+    LIMIT 1
+""")
+    suspend fun getMusicInfoByNameArtistAndStyle(
+        musicName: String,
+        artistName: String,
+        styleName: String
+    ): MusicInfo?
 }

@@ -58,18 +58,22 @@ class MusicInfoViewModel(
         textOfMemo: String,
         numOfRightHand: Float,
         numOfLeftHand: Float,
+        onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
-            repository.saveMusicInfo(
+            val success = repository.saveMusicInfo(
                 textOfMusic,
                 textOfArtist,
                 textOfGenre,
                 textOfStyle,
                 textOfMemo,
                 numOfRightHand,
-                numOfLeftHand,
+                numOfLeftHand
             )
-            loadAllMusicInfo()
+            if (success) {
+                loadAllMusicInfo()
+            }
+            onResult(success)
         }
     }
 
