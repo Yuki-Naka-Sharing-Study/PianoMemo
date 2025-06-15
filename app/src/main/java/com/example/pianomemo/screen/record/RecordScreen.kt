@@ -285,7 +285,7 @@ fun RecordScreen(
                                             toastMessage = "記録しました"
                                             toastIcon = R.drawable.music_note
                                         } else {
-                                            toastMessage = "既に同じ曲名・作曲者名・演奏スタイルが登録されています"
+                                            toastMessage = "既に同じ曲名・作曲者名・演奏スタイルが\n登録されています"
                                             toastIcon = R.drawable.warning
                                         }
                                         showToast = true
