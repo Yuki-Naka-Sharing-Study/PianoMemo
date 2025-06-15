@@ -40,6 +40,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.LaunchedEffect
@@ -594,9 +595,7 @@ private fun SearchBar(
             value = query,
             onValueChange = onQueryChange,
             placeholder = {
-                Text(
-                    stringResource(id = R.string.search_by_text)
-                )
+                Text(stringResource(id = R.string.search_by_text))
             },
             leadingIcon = {
                 Icon(
@@ -605,6 +604,16 @@ private fun SearchBar(
                         id = R.string.content_description_search_icon
                     )
                 )
+            },
+            trailingIcon = {
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Clear text"
+                        )
+                    }
+                }
             },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
