@@ -75,10 +75,15 @@ import com.example.pianomemo.data.remote.SpotifyApiService
 import com.example.pianomemo.data.remote.Track
 import com.example.pianomemo.viewmodel.MusicInfoViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
 fun RecordScreen(
     viewModel: MusicInfoViewModel,
@@ -96,6 +101,8 @@ fun RecordScreen(
     var numOfLeftHand by remember { mutableFloatStateOf(0F) }
     var suggestedMusic by remember { mutableStateOf<List<Track>>(emptyList()) }
     var suggestedArtists by remember { mutableStateOf<List<Artist>>(emptyList()) }
+    val musicQuery = remember { MutableStateFlow("") }
+    val artistQuery = remember { MutableStateFlow("") }
     var isArtistsSuggestionVisible by remember { mutableStateOf(false) }
     var isMusicSuggestionVisible by remember { mutableStateOf(false) }
     val musicFieldOffset = remember { mutableStateOf(Offset.Zero) }
@@ -115,34 +122,32 @@ fun RecordScreen(
             artistFieldHeight = coordinates.size.height
         }
 
-    LaunchedEffect(textOfMusic) {
-        val isMusicInSuggestions = suggestedMusic.any { it.name == textOfMusic }
-        if (textOfMusic.isNotBlank()  && !isMusicInSuggestions) {
-            suggestedMusic = fetchMusicSuggestions(
-                textOfMusic,
-                authToken,
-                retrofitService
-            )
-            isMusicSuggestionVisible = suggestedMusic.isNotEmpty()
-        } else {
-            suggestedMusic = emptyList()
-            isMusicSuggestionVisible = false
-        }
+    LaunchedEffect(Unit) {
+        musicQuery
+            .debounce(500)
+            .filter { it.isNotBlank() }
+            .distinctUntilChanged()
+            .collect { query ->
+                val isAlreadyInList = suggestedMusic.any { it.name == query }
+                if (!isAlreadyInList) {
+                    suggestedMusic = fetchMusicSuggestions(query, authToken, retrofitService)
+                    isMusicSuggestionVisible = suggestedMusic.isNotEmpty()
+                }
+            }
     }
 
-    LaunchedEffect(textOfArtist) {
-        val isArtistInSuggestions = suggestedArtists.any { it.name == textOfArtist }
-        if (textOfArtist.isNotBlank() && !isArtistInSuggestions) {
-            suggestedArtists = fetchArtistSuggestions(
-                textOfArtist,
-                authToken,
-                retrofitService
-            )
-            isArtistsSuggestionVisible = suggestedArtists.isNotEmpty()
-        } else {
-            suggestedArtists = emptyList()
-            isArtistsSuggestionVisible = false
-        }
+    LaunchedEffect(Unit) {
+        artistQuery
+            .debounce(500)
+            .filter { it.isNotBlank() }
+            .distinctUntilChanged()
+            .collect { query ->
+                val isAlreadyInList = suggestedArtists.any { it.name == query }
+                if (!isAlreadyInList) {
+                    suggestedArtists = fetchArtistSuggestions(query, authToken, retrofitService)
+                    isArtistsSuggestionVisible = suggestedArtists.isNotEmpty()
+                }
+            }
     }
 
     Scaffold(
@@ -176,7 +181,10 @@ fun RecordScreen(
                     label = stringResource(id = R.string.music_name),
                     placeholder = stringResource(id = R.string.placeholder_music),
                     value = textOfMusic,
-                    onValueChange = { textOfMusic = it },
+                    onValueChange = {
+                        textOfMusic = it
+                        musicQuery.value = it
+                    },
                     modifier = musicFieldModifier
                 )
 
@@ -186,7 +194,10 @@ fun RecordScreen(
                     label = stringResource(id = R.string.artist_name),
                     placeholder = stringResource(id = R.string.placeholder_artist),
                     value = textOfArtist,
-                    onValueChange = { textOfArtist = it },
+                    onValueChange = {
+                        textOfArtist = it
+                        artistQuery.value = it
+                    },
                     modifier = artistFieldModifier
                 )
 
